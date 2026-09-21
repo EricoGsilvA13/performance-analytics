@@ -10,4 +10,4 @@ class Usuario(Base):
     email = Column(String(150), unique=True, nullable=False)
     data_criacao = Column(TIMESTAMP, nullable=False)
     
-    sessoes = relationship("Sessao", back_populates="usuario")
+    sessoes = relationship("Sessao", back_populates="usuario", cascade="all,delete-orphan")

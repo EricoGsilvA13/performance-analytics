@@ -15,3 +15,5 @@ class UsuarioResponseSchema(UsuarioBase):
     id: int
     data_criacao: datetime
 
+class UsuarioUpdateSchema(UsuarioBase):
+    pass
