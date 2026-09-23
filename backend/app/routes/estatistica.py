@@ -4,7 +4,7 @@ from app.database.session import SessionLocal
 from app.services.estatistica_service import EstatisticaService
 
 
-estatistica_router = APIRouter(prefix="estatisticas", tags=["Estatisticas"])
+estatistica_router = APIRouter(prefix="/estatisticas", tags=["Estatisticas"])
 
 def get_db():
     db = SessionLocal()

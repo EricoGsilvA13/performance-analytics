@@ -4,7 +4,7 @@ from app.schemas.sessao import SessaoCreateSchema, SessaoResponseSchema
 from app.services.sessao_service import SessaoService
 from sqlalchemy.orm import Session
 
-sessao_router = APIRouter(prefix="sessoes", tags=["Sessões"])
+sessao_router = APIRouter(prefix="/sessoes", tags=["Sessões"])
 
 def get_db():
     db = SessionLocal()
