@@ -4,7 +4,7 @@ from app.services.usuario_service import UsuarioService
 from app.database.session import SessionLocal
 from sqlalchemy.orm import Session
 
-router = APIRouter()
+usuario_router = APIRouter(prefix="/usuarios", tags=["Usuários"])
 
 def get_db():
     db = SessionLocal()
@@ -13,35 +13,35 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/usuarios")
+@usuario_router.post("/criar")
 def criar_usuario(usuario_schema: UsuarioCreateSchema, db: Session = Depends(get_db)):
 
     novo_usuario = UsuarioService().criar_usuario(db, usuario_schema)
     
     return novo_usuario
 
-@router.get("/usuarios")
+@usuario_router.get("/listar")
 def listar_usuarios(db: Session = Depends(get_db)):
 
     usuarios = UsuarioService().listar_usuarios(db)
 
     return usuarios
 #GET/usuarios/{id}
-@router.get("/usuarios/{usuario_id}")
+@usuario_router.get("/buscar/{usuario_id}")
 def buscar_usuario(usuario_id: int, db: Session = Depends(get_db)):
 
     usuario = UsuarioService().buscar_usuario_por_id(db, usuario_id)
 
     return usuario
 #PUT/usuarios/{id}
-@router.put("/usuarios/{usuario_id}")
+@usuario_router.put("/atualizar/{usuario_id}")
 def atualizar_usuario(usuario_schema: UsuarioUpdateSchema, usuario_id:int, db: Session = Depends(get_db)):
 
     usuario_atualizado = UsuarioService().atualizar_usuario(db, usuario_schema, usuario_id)
 
     return usuario_atualizado
 #DELETE/usuarios/{id}
-@router.delete("/usuarios/{usuario_id}")
+@usuario_router.delete("/excluir/{usuario_id}")
 def deletar_usuario(usuario_id: int, db: Session = Depends(get_db)):
 
     UsuarioService().deletar_usuario(db, usuario_id)

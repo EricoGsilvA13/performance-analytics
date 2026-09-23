@@ -1,9 +1,14 @@
 from fastapi import FastAPI
-from app.routes.usuario import router
-
 
 app = FastAPI()
 
-app.include_router(router)
+from app.routes.usuario import usuario_router
+from app.routes.sessao import sessao_router
+from app.routes.estatistica import estatistica_router
+
+
+app.include_router(usuario_router)
+app.include_router(sessao_router)
+app.include_router(estatistica_router)
 
 #uvicorn app.main:app --reload
