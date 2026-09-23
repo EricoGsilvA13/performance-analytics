@@ -34,7 +34,7 @@ def buscar_sessao(sessao_id: int, db: Session = Depends(get_db)):
 
     return sessao_buscada
 #DELETE/sessao/{id}
-@router.delete("/sessoes/{sessao_id}")
+@router.delete("/sess/{sessao_id}")
 def excluir_sessao(sessao_id: int, db: Session = Depends(get_db)):
 
     sessao_excluida = SessaoService().excluir_sessao(db, sessao_id)
