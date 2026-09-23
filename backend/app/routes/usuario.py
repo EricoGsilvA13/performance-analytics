@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from app.schemas.usuario import UsuarioCreateSchema, UsuarioResponseSchema, UsuarioUpdateSchema
+from app.schemas.usuario import UsuarioCreateSchema, UsuarioUpdateSchema
 from app.services.usuario_service import UsuarioService
 from app.database.session import SessionLocal
 from sqlalchemy.orm import Session
