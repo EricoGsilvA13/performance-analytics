@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
 from app.schemas.estatistica import EstatisticaSessaoSchema, EstatisticaUsuarioSchema
 from app.models.sessao import Sessao
 
@@ -8,7 +9,7 @@ class EstatisticaService:
         sessao_valida = db.query(Sessao).filter(Sessao.id == sessao_id).first()
 
         if not sessao_valida:
-            raise ValueError("Sessão não encontrada")
+            raise HTTPException(status_code=404, detail="Sessão não encontrada")
 
         taxa_acerto = (sessao_valida.acertos/sessao_valida.tentativas)*100
         taxa_erro = (sessao_valida.erros/sessao_valida.tentativas)*100
@@ -24,7 +25,7 @@ class EstatisticaService:
         sessao_valida = db.query(Sessao).filter(Sessao.usuario_id == usuario_id).first()
         
         if not sessao_valida:
-            raise ValueError("Usuario não encontrado")
+            raise HTTPException(status_code=404, detail="Usuario não encontrado")
 
         sessoes = db.query(Sessao).filter(Sessao.usuario_id == usuario_id).all()
 

@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
 from app.models.sessao import Sessao
 from app.models.usuario import Usuario
-from app.schemas.sessao import SessaoCreateSchema, SessaoResponseSchema
+from app.schemas.sessao import SessaoCreateSchema
 
 class SessaoService:
     def criar_sessao(self, db: Session, sessao_schema: SessaoCreateSchema):
@@ -9,19 +10,19 @@ class SessaoService:
         usuario_valido = db.query(Usuario).filter(Usuario.id == sessao_schema.usuario_id).first()
 
         if not usuario_valido:
-            raise ValueError("Usuario não encontrada")
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
         if sessao_schema.tentativas <= 0:
-            raise ValueError("Números de tentativas invalidas")
-
+            raise HTTPException(status_code=422, detail="Números de tentativas invalidas")
+        
         if sessao_schema.erros > sessao_schema.tentativas:
-            raise ValueError("Números de erros invalidas")
+            raise HTTPException(status_code=422, detail="Números de erros invalidas")
 
         if sessao_schema.acertos > sessao_schema.tentativas:
-            raise ValueError("Números de acertos invalidas")
+            raise HTTPException(status_code=422, detail="Números de acertos invalidas")
 
         if sessao_schema.acertos + sessao_schema.erros != sessao_schema.tentativas:
-            raise ValueError("Números de tentativas invalidas")
+            raise HTTPException(status_code=422, detail="Números de tentativas invalidas")
         
         nova_sessao = Sessao(
             usuario_id=sessao_schema.usuario_id,
@@ -38,7 +39,7 @@ class SessaoService:
 
         return nova_sessao
 
-    def listar_sessoes(sel, db: Session):
+    def listar_sessoes(self, db: Session):
 
         sessoes = db.query(Sessao).all()
 
@@ -49,7 +50,7 @@ class SessaoService:
         sessao_buscada = db.query(Sessao).filter(Sessao.id == sessao_id).first()
 
         if not sessao_buscada:
-            raise ValueError("Sessão não encontrada")
+            raise HTTPException(status_code=404, detail="Sessão não encontrado")
 
         return sessao_buscada
     
@@ -58,7 +59,7 @@ class SessaoService:
         sessao_excluida = db.query(Sessao).filter(Sessao.id == sessao_id).first()
 
         if not sessao_excluida:
-            raise ValueError("Sessão não encontrada")
+            raise HTTPException(status_code=404, detail="Sessão não encontrada")
 
         db.delete(sessao_excluida)
         db.commit()

@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
 from app.models.usuario import Usuario
 from app.schemas.usuario import UsuarioCreateSchema, UsuarioUpdateSchema
 
@@ -12,9 +13,8 @@ class UsuarioService:
         ).first()
 
         if usuario_existente:
-            raise ValueError("E-mail já cadastrado")
-
-
+            raise HTTPException(status_code=409, detail="Email já cadastrado")
+        
         novo_usuario = Usuario(
             nome=usuario_schema.nome,
             email=usuario_schema.email
@@ -38,8 +38,8 @@ class UsuarioService:
         usuario_buscado = db.query(Usuario).filter(Usuario.id == usuario_id).first()
 
         if not usuario_buscado:
-            raise ValueError("usuário não existe")
-
+            raise HTTPException(status_code=404, detail="Usuário não existe")
+        
         return usuario_buscado
 
     def atualizar_usuario(self, db: Session, usuario_schema: UsuarioUpdateSchema, usuario_id: int):
@@ -47,12 +47,13 @@ class UsuarioService:
         usuario_buscado = db.query(Usuario).filter(Usuario.id == usuario_id).first()
 
         if not usuario_buscado:
-            raise ValueError("usuário não existe")
+            raise HTTPException(status_code=404, detail="Usuário não existe")
+        
 
         email_existente = db.query(Usuario).filter(Usuario.email == usuario_schema.email).first()
 
         if email_existente and email_existente.id != usuario_id:
-            raise ValueError("email ja  existe")
+            raise HTTPException(status_code=409, detail="Email já existe")
 
         usuario_buscado.nome = usuario_schema.nome
         usuario_buscado.email = usuario_schema.email
@@ -68,7 +69,7 @@ class UsuarioService:
         usuario_buscado = db.query(Usuario).filter(Usuario.id == usuario_id).first()
 
         if not usuario_buscado:
-            raise ValueError("Usuario não existe")
+            raise HTTPException(status_code=404, detail="Usuário não existe")
 
         db.delete(usuario_buscado)
         db.commit()
