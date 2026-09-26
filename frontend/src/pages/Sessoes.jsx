@@ -1,300 +1,501 @@
 import { useEffect, useState } from "react";
+
 import api from "../services/api";
 
+import "../styles/sessao.css";
+
 function Sessoes() {
-const [sessoes, setSessoes] = useState([]);
 
-const [usuarioId, setUsuarioId] = useState("");
-const [duracao, setDuracao] = useState("");
-const [tentativas, setTentativas] = useState("");
-const [acertos, setAcertos] = useState("");
-const [erros, setErros] = useState("");
-const [pontuacao, setPontuacao] = useState("");
+    const [sessoes, setSessoes] = useState([]);
 
-const [carregando, setCarregando] = useState(true);
-const [cadastrando, setCadastrando] = useState(false);
-const [excluindo, setExcluindo] = useState(null);
+    const [usuarioId, setUsuarioId] = useState("");
+    const [duracao, setDuracao] = useState("");
+    const [tentativas, setTentativas] = useState("");
+    const [acertos, setAcertos] = useState("");
+    const [erros, setErros] = useState("");
+    const [pontuacao, setPontuacao] = useState("");
 
-const [erro, setErro] = useState("");
-const [mensagem, setMensagem] = useState("");
+    const [carregando, setCarregando] = useState(true);
+    const [cadastrando, setCadastrando] = useState(false);
+    const [excluindo, setExcluindo] = useState(null);
 
-useEffect(() => {
-    buscarSessoes();
-}, []);
+    const [erro, setErro] = useState("");
+    const [mensagem, setMensagem] = useState("");
 
-async function buscarSessoes() {
-    try {
-        setCarregando(true);
+    useEffect(() => {
+        buscarSessoes();
+    }, []);
+
+    async function buscarSessoes() {
+
+        try {
+
+            setCarregando(true);
+            setErro("");
+
+            const resposta =
+                await api.get("/sessoes/listar");
+
+            setSessoes(resposta.data);
+
+        } catch (error) {
+
+            console.error(
+                "Erro ao buscar sessões:",
+                error
+            );
+
+            if (error.response) {
+
+                setErro(
+                    `Erro ${error.response.status}: ${
+                        error.response.data?.detail ||
+                        "Não foi possível buscar as sessões."
+                    }`
+                );
+
+            } else if (error.request) {
+
+                setErro(
+                    "O servidor não respondeu à requisição."
+                );
+
+            } else {
+
+                setErro(
+                    `Erro: ${error.message}`
+                );
+            }
+
+        } finally {
+
+            setCarregando(false);
+
+        }
+    }
+
+    async function cadastrarSessao(event) {
+
+        event.preventDefault();
+
         setErro("");
+        setMensagem("");
 
-        const resposta = await api.get("/sessoes/listar");
+        if (
+            !usuarioId ||
+            !duracao ||
+            !tentativas ||
+            !acertos ||
+            !erros ||
+            !pontuacao
+        ) {
 
-        setSessoes(resposta.data);
-    } catch (error) {
-        console.error("Erro ao buscar sessões:", error);
-
-        if (error.response) {
             setErro(
-                `Erro ${error.response.status}: ${error.response.statusText}`
+                "Preencha todos os campos."
             );
-        } else if (error.request) {
-            setErro("O servidor não respondeu à requisição.");
-        } else {
-            setErro(`Erro: ${error.message}`);
+
+            return;
         }
-    } finally {
-        setCarregando(false);
+
+        try {
+
+            setCadastrando(true);
+
+            await api.post(
+                "/sessoes/criar",
+                {
+                    usuario_id: Number(usuarioId),
+                    duracao: Number(duracao),
+                    tentativas: Number(tentativas),
+                    acertos: Number(acertos),
+                    erros: Number(erros),
+                    pontuacao: Number(pontuacao),
+                }
+            );
+
+            setMensagem(
+                "Sessão cadastrada com sucesso!"
+            );
+
+            setUsuarioId("");
+            setDuracao("");
+            setTentativas("");
+            setAcertos("");
+            setErros("");
+            setPontuacao("");
+
+            await buscarSessoes();
+
+        } catch (error) {
+
+            console.error(
+                "Erro ao cadastrar sessão:",
+                error
+            );
+
+            if (error.response) {
+
+                setErro(
+                    `Erro ${error.response.status}: ${
+                        error.response.data?.detail ||
+                        "Não foi possível cadastrar a sessão."
+                    }`
+                );
+
+            } else if (error.request) {
+
+                setErro(
+                    "O servidor não respondeu à requisição."
+                );
+
+            } else {
+
+                setErro(
+                    `Erro: ${error.message}`
+                );
+            }
+
+        } finally {
+
+            setCadastrando(false);
+
+        }
     }
-}
 
-async function cadastrarSessao(event) {
-    event.preventDefault();
+    async function excluirSessao(sessaoId) {
 
-    setErro("");
-    setMensagem("");
+        const confirmar =
+            window.confirm(
+                "Tem certeza que deseja excluir esta sessão?"
+            );
 
-    if (
-        !usuarioId ||
-        !duracao ||
-        !tentativas ||
-        !acertos ||
-        !erros ||
-        !pontuacao
-    ) {
-        setErro("Preencha todos os campos.");
-        return;
-    }
+        if (!confirmar) {
+            return;
+        }
 
-    try {
-        setCadastrando(true);
+        setErro("");
+        setMensagem("");
 
-        await api.post("/sessoes/criar", {
-            usuario_id: Number(usuarioId),
-            duracao: Number(duracao),
-            tentativas: Number(tentativas),
-            acertos: Number(acertos),
-            erros: Number(erros),
-            pontuacao: Number(pontuacao),
-        });
+        try {
 
-        setMensagem("Sessão cadastrada com sucesso!");
+            setExcluindo(sessaoId);
 
-        setUsuarioId("");
-        setDuracao("");
-        setTentativas("");
-        setAcertos("");
-        setErros("");
-        setPontuacao("");
+            await api.delete(
+                `/sessoes/excluir/${sessaoId}`
+            );
 
-        // Atualiza a lista após o cadastro
-        await buscarSessoes();
-    } catch (error) {
-        console.error("Erro ao cadastrar sessão:", error);
+            setMensagem(
+                "Sessão excluída com sucesso!"
+            );
 
-        if (error.response) {
+            await buscarSessoes();
+
+        } catch (error) {
+
+            console.error(
+                "Erro ao excluir sessão:",
+                error
+            );
+
             setErro(
-                `Erro ${error.response.status}: ${
-                    error.response.data?.detail ||
-                    "Não foi possível cadastrar a sessão."
-                }`
+                "Não foi possível excluir a sessão."
             );
-        } else if (error.request) {
-            setErro("O servidor não respondeu à requisição.");
-        } else {
-            setErro(`Erro: ${error.message}`);
+
+        } finally {
+
+            setExcluindo(null);
+
         }
-    } finally {
-        setCadastrando(false);
-    }
-}
-
-async function excluirSessao(sessaoId) {
-    const confirmar = window.confirm(
-        "Tem certeza que deseja excluir esta sessão?"
-    );
-
-    if (!confirmar) {
-        return;
     }
 
-    setErro("");
-    setMensagem("");
+    return (
 
-    try {
-        setExcluindo(sessaoId);
+        <div className="sessao-page">
 
-        await api.delete(`/sessoes/excluir/${sessaoId}`);
+            <div className="sessao-container">
 
-        setMensagem("Sessão excluída com sucesso!");
+                <div className="sessao-header">
 
-        // Atualiza a lista após a exclusão
-        await buscarSessoes();
-    } catch (error) {
-        console.error("Erro ao excluir sessão:", error);
+                    <h2>Sessões</h2>
 
-        if (error.response) {
-            setErro(
-                `Erro ${error.response.status}: ${
-                    error.response.data?.detail ||
-                    "Não foi possível excluir a sessão."
-                }`
-            );
-        } else if (error.request) {
-            setErro("O servidor não respondeu à requisição.");
-        } else {
-            setErro(`Erro: ${error.message}`);
-        }
-    } finally {
-        setExcluindo(null);
-    }
-}
+                    <p>
+                        Registro das sessões de desempenho
+                    </p>
 
-if (carregando) {
-    return <p>Carregando sessões...</p>;
-}
+                </div>
 
-return (
-    <div>
-        <h1>Sessões</h1>
+                {mensagem && (
+                    <div className="sessao-success">
+                        {mensagem}
+                    </div>
+                )}
 
-        <h2>Cadastrar sessão</h2>
+                {erro && (
+                    <div className="sessao-error">
+                        {erro}
+                    </div>
+                )}
 
-        <form onSubmit={cadastrarSessao}>
-            <div>
-                <label htmlFor="usuarioId">ID do usuário:</label>
-                <br />
+                <div className="sessao-form-card">
 
-                <input
-                    id="usuarioId"
-                    type="number"
-                    value={usuarioId}
-                    onChange={(event) => setUsuarioId(event.target.value)}
-                    placeholder="Digite o ID do usuário"
-                />
-            </div>
+                    <h2>
+                        Cadastrar sessão
+                    </h2>
 
-            <br />
+                    <form
+                        className="sessao-form"
+                        onSubmit={cadastrarSessao}
+                    >
 
-            <div>
-                <label htmlFor="duracao">Duração:</label>
-                <br />
+                        <div className="sessao-field">
 
-                <input
-                    id="duracao"
-                    type="number"
-                    value={duracao}
-                    onChange={(event) => setDuracao(event.target.value)}
-                    placeholder="Duração da sessão"
-                />
-            </div>
+                            <label htmlFor="usuarioId">
+                                ID do usuário
+                            </label>
 
-            <br />
+                            <input
+                                id="usuarioId"
+                                type="number"
+                                value={usuarioId}
+                                onChange={(event) =>
+                                    setUsuarioId(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="ID do usuário"
+                            />
 
-            <div>
-                <label htmlFor="tentativas">Tentativas:</label>
-                <br />
+                        </div>
 
-                <input
-                    id="tentativas"
-                    type="number"
-                    value={tentativas}
-                    onChange={(event) => setTentativas(event.target.value)}
-                    placeholder="Número de tentativas"
-                />
-            </div>
+                        <div className="sessao-field">
 
-            <br />
+                            <label htmlFor="duracao">
+                                Duração
+                            </label>
 
-            <div>
-                <label htmlFor="acertos">Acertos:</label>
-                <br />
+                            <input
+                                id="duracao"
+                                type="number"
+                                value={duracao}
+                                onChange={(event) =>
+                                    setDuracao(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="Duração"
+                            />
 
-                <input
-                    id="acertos"
-                    type="number"
-                    value={acertos}
-                    onChange={(event) => setAcertos(event.target.value)}
-                    placeholder="Número de acertos"
-                />
-            </div>
+                        </div>
 
-            <br />
+                        <div className="sessao-field">
 
-            <div>
-                <label htmlFor="erros">Erros:</label>
-                <br />
+                            <label htmlFor="tentativas">
+                                Tentativas
+                            </label>
 
-                <input
-                    id="erros"
-                    type="number"
-                    value={erros}
-                    onChange={(event) => setErros(event.target.value)}
-                    placeholder="Número de erros"
-                />
-            </div>
+                            <input
+                                id="tentativas"
+                                type="number"
+                                value={tentativas}
+                                onChange={(event) =>
+                                    setTentativas(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="Tentativas"
+                            />
 
-            <br />
+                        </div>
 
-            <div>
-                <label htmlFor="pontuacao">Pontuação:</label>
-                <br />
+                        <div className="sessao-field">
 
-                <input
-                    id="pontuacao"
-                    type="number"
-                    value={pontuacao}
-                    onChange={(event) => setPontuacao(event.target.value)}
-                    placeholder="Pontuação"
-                />
-            </div>
+                            <label htmlFor="acertos">
+                                Acertos
+                            </label>
 
-            <br />
+                            <input
+                                id="acertos"
+                                type="number"
+                                value={acertos}
+                                onChange={(event) =>
+                                    setAcertos(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="Acertos"
+                            />
 
-            <button type="submit" disabled={cadastrando}>
-                {cadastrando ? "Cadastrando..." : "Cadastrar sessão"}
-            </button>
-        </form>
+                        </div>
 
-        <br />
+                        <div className="sessao-field">
 
-        {mensagem && <p>{mensagem}</p>}
+                            <label htmlFor="erros">
+                                Erros
+                            </label>
 
-        {erro && <p>{erro}</p>}
+                            <input
+                                id="erros"
+                                type="number"
+                                value={erros}
+                                onChange={(event) =>
+                                    setErros(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="Erros"
+                            />
 
-        <hr />
+                        </div>
 
-        <h2>Lista de sessões</h2>
+                        <div className="sessao-field">
 
-        {sessoes.length === 0 ? (
-            <p>Nenhuma sessão encontrada.</p>
-        ) : (
-            <ul>
-                {sessoes.map((sessao) => (
-                    <li key={sessao.id}>
-                        ID: {sessao.id} | Usuário: {sessao.usuario_id} |
-                        Duração: {sessao.duracao} | Tentativas:{" "}
-                        {sessao.tentativas} | Acertos: {sessao.acertos} |
-                        Erros: {sessao.erros} | Pontuação:{" "}
-                        {sessao.pontuacao} | Data:{" "}
-                        {new Date(sessao.data_sessao).toLocaleString()}
-                        {" "}
+                            <label htmlFor="pontuacao">
+                                Pontuação
+                            </label>
+
+                            <input
+                                id="pontuacao"
+                                type="number"
+                                value={pontuacao}
+                                onChange={(event) =>
+                                    setPontuacao(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="Pontuação"
+                            />
+
+                        </div>
 
                         <button
-                            onClick={() => excluirSessao(sessao.id)}
-                            disabled={excluindo === sessao.id}
+                            className="sessao-submit"
+                            type="submit"
+                            disabled={cadastrando}
                         >
-                            {excluindo === sessao.id
-                                ? "Excluindo..."
-                                : "Excluir"}
+                            {cadastrando
+                                ? "Cadastrando..."
+                                : "Cadastrar sessão"}
                         </button>
-                    </li>
-                ))}
-            </ul>
-        )}
-    </div>
-);
 
+                    </form>
 
+                </div>
+
+                <div className="sessao-list-card">
+
+                    <h2>
+                        Sessões registradas
+                    </h2>
+
+                    {carregando ? (
+
+                        <p className="sessao-loading">
+                            Carregando sessões...
+                        </p>
+
+                    ) : sessoes.length === 0 ? (
+
+                        <p className="sessao-empty">
+                            Nenhuma sessão encontrada.
+                        </p>
+
+                    ) : (
+
+                        <div className="sessao-list">
+
+                            {sessoes.map((sessao) => (
+
+                                <div
+                                    className="sessao-item"
+                                    key={sessao.id}
+                                >
+
+                                    <div className="sessao-id">
+                                        #{sessao.id}
+                                    </div>
+
+                                    <div className="sessao-info">
+
+                                        <span className="sessao-label">
+                                            Usuário
+                                        </span>
+
+                                        <span className="sessao-value">
+                                            {sessao.usuario_id}
+                                        </span>
+
+                                    </div>
+
+                                    <div className="sessao-info">
+
+                                        <span className="sessao-label">
+                                            Tentativas
+                                        </span>
+
+                                        <span className="sessao-value">
+                                            {sessao.tentativas}
+                                        </span>
+
+                                    </div>
+
+                                    <div className="sessao-info">
+
+                                        <span className="sessao-label">
+                                            Pontuação
+                                        </span>
+
+                                        <span className="sessao-value">
+                                            {sessao.pontuacao}
+                                        </span>
+
+                                    </div>
+
+                                    <div className="sessao-info">
+
+                                        <span className="sessao-label">
+                                            Data
+                                        </span>
+
+                                        <span className="sessao-value">
+                                            {new Date(
+                                                sessao.data_sessao
+                                            ).toLocaleString()}
+                                        </span>
+
+                                    </div>
+
+                                    <button
+                                        className="sessao-delete"
+                                        onClick={() =>
+                                            excluirSessao(
+                                                sessao.id
+                                            )
+                                        }
+                                        disabled={
+                                            excluindo ===
+                                            sessao.id
+                                        }
+                                    >
+                                        {excluindo ===
+                                        sessao.id
+                                            ? "Excluindo..."
+                                            : "Excluir"}
+                                    </button>
+
+                                </div>
+
+                            ))}
+
+                        </div>
+
+                    )}
+
+                </div>
+
+            </div>
+
+        </div>
+    );
 }
 
 export default Sessoes;

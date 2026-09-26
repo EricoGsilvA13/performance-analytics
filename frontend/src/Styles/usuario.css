@@ -1,0 +1,228 @@
+.usuario-page {
+    min-height: calc(100vh - 80px);
+}
+
+.usuario-container {
+    max-width: 1200px;
+
+    margin: 0 auto;
+}
+
+.usuario-header {
+    margin-bottom: 25px;
+}
+
+.usuario-header h2 {
+    margin: 0;
+
+    color: #123b5d;
+
+    font-size: 26px;
+}
+
+.usuario-header p {
+    color: #64748b;
+
+    margin-top: 6px;
+}
+
+/* =========================
+   FORMULÁRIO
+========================= */
+
+.usuario-form-card {
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.06);
+
+    margin-bottom: 25px;
+}
+
+.usuario-form-card h2 {
+    margin-top: 0;
+
+    color: #123b5d;
+}
+
+.usuario-form {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr auto;
+
+    gap: 15px;
+
+    align-items: end;
+}
+
+.usuario-field {
+    display: flex;
+
+    flex-direction: column;
+}
+
+.usuario-field label {
+    margin-bottom: 7px;
+
+    font-weight: 600;
+
+    color: #334155;
+}
+
+.usuario-field input {
+    padding: 11px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+}
+
+.usuario-field input:focus {
+    outline: none;
+
+    border-color: #2563eb;
+}
+
+.usuario-button {
+    padding: 11px 20px;
+
+    background: #2563eb;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+}
+
+.usuario-button:hover {
+    background: #1d4ed8;
+}
+
+.usuario-button:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+/* =========================
+   TABELA
+========================= */
+
+.usuario-table-card {
+    background: white;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.06);
+
+    overflow-x: auto;
+}
+
+.usuario-table {
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+.usuario-table th {
+    padding: 15px;
+
+    text-align: left;
+
+    background: #123b5d;
+
+    color: white;
+}
+
+.usuario-table td {
+    padding: 15px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.usuario-table tr:hover {
+    background: #f8fafc;
+}
+
+.usuario-delete {
+    padding: 8px 14px;
+
+    background: #dc2626;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+}
+
+.usuario-delete:hover {
+    background: #b91c1c;
+}
+
+.usuario-delete:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+/* =========================
+   MENSAGENS
+========================= */
+
+.usuario-success {
+    padding: 12px;
+
+    margin-bottom: 15px;
+
+    background: #dcfce7;
+
+    color: #166534;
+
+    border-radius: 8px;
+}
+
+.usuario-error {
+    padding: 12px;
+
+    margin-bottom: 15px;
+
+    background: #fee2e2;
+
+    color: #991b1b;
+
+    border-radius: 8px;
+}
+
+.usuario-loading,
+.usuario-empty {
+    padding: 25px;
+
+    color: #64748b;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media (max-width: 800px) {
+
+    .usuario-form {
+        grid-template-columns: 1fr;
+    }
+}

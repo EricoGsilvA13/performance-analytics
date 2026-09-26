@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
+
 import api from "../services/api";
 
+import "../styles/usuario.css";
+
 function Usuarios() {
+
     const [usuarios, setUsuarios] = useState([]);
 
     const [nome, setNome] = useState("");
@@ -19,79 +23,106 @@ function Usuarios() {
     }, []);
 
     async function buscarUsuarios() {
+
         try {
+
             setCarregando(true);
             setErro("");
 
-            const resposta = await api.get("/usuarios/listar");
+            const resposta =
+                await api.get("/usuarios/listar");
 
             setUsuarios(resposta.data);
-        } catch (error) {
-            console.error("Erro ao buscar usuários:", error);
 
-            if (error.response) {
-                setErro(
-                    `Erro ${error.response.status}: ${error.response.statusText}`
-                );
-            } else if (error.request) {
-                setErro("O servidor não respondeu à requisição.");
-            } else {
-                setErro(`Erro: ${error.message}`);
-            }
+        } catch (error) {
+
+            console.error(
+                "Erro ao buscar usuários:",
+                error
+            );
+
+            setErro(
+                "Não foi possível carregar os usuários."
+            );
+
         } finally {
+
             setCarregando(false);
+
         }
     }
 
     async function cadastrarUsuario(event) {
+
         event.preventDefault();
 
         setErro("");
         setMensagem("");
 
         if (!nome.trim() || !email.trim()) {
-            setErro("Preencha o nome e o e-mail.");
+
+            setErro(
+                "Preencha todos os campos."
+            );
+
             return;
         }
 
         try {
+
             setCadastrando(true);
 
-            await api.post("/usuarios/criar", {
-                nome: nome,
-                email: email,
-            });
+            await api.post(
+                "/usuarios/criar",
+                {
+                    nome: nome.trim(),
+                    email: email.trim()
+                }
+            );
 
-            setMensagem("Usuário cadastrado com sucesso!");
+            setMensagem(
+                "Usuário cadastrado com sucesso!"
+            );
 
             setNome("");
             setEmail("");
 
             await buscarUsuarios();
+
         } catch (error) {
-            console.error("Erro ao cadastrar usuário:", error);
+
+            console.error(
+                "Erro ao cadastrar usuário:",
+                error
+            );
 
             if (error.response) {
+
                 setErro(
-                    `Erro ${error.response.status}: ${
-                        error.response.data?.detail ||
-                        "Não foi possível cadastrar o usuário."
-                    }`
+                    error.response.data?.detail ||
+                    "Não foi possível cadastrar o usuário."
                 );
-            } else if (error.request) {
-                setErro("O servidor não respondeu à requisição.");
+
             } else {
-                setErro(`Erro: ${error.message}`);
+
+                setErro(
+                    "Não foi possível conectar ao servidor."
+                );
             }
+
         } finally {
+
             setCadastrando(false);
+
         }
     }
 
-    async function excluirUsuario(usuarioId) {
-        const confirmar = window.confirm(
-            "Tem certeza que deseja excluir este usuário?"
-        );
+    async function excluirUsuario(id) {
+
+        const confirmar =
+            window.confirm(
+                "Tem certeza que deseja excluir este usuário?"
+            );
 
         if (!confirmar) {
             return;
@@ -101,111 +132,214 @@ function Usuarios() {
         setMensagem("");
 
         try {
-            setExcluindo(usuarioId);
 
-            await api.delete(`/usuarios/excluir/${usuarioId}`);
+            setExcluindo(id);
 
-            setMensagem("Usuário excluído com sucesso!");
+            await api.delete(
+                `/usuarios/excluir/${id}`
+            );
 
-            // Atualiza a lista após a exclusão
+            setMensagem(
+                "Usuário excluído com sucesso!"
+            );
+
             await buscarUsuarios();
-        } catch (error) {
-            console.error("Erro ao excluir usuário:", error);
 
-            if (error.response) {
-                setErro(
-                    `Erro ${error.response.status}: ${
-                        error.response.data?.detail ||
-                        "Não foi possível excluir o usuário."
-                    }`
-                );
-            } else if (error.request) {
-                setErro("O servidor não respondeu à requisição.");
-            } else {
-                setErro(`Erro: ${error.message}`);
-            }
+        } catch (error) {
+
+            console.error(
+                "Erro ao excluir usuário:",
+                error
+            );
+
+            setErro(
+                "Não foi possível excluir o usuário."
+            );
+
         } finally {
+
             setExcluindo(null);
+
         }
     }
 
-    if (carregando) {
-        return <p>Carregando usuários...</p>;
-    }
-
     return (
-        <div>
-            <h1>Usuários</h1>
 
-            <h2>Cadastrar usuário</h2>
+        <div className="usuario-page">
 
-            <form onSubmit={cadastrarUsuario}>
-                <div>
-                    <label htmlFor="nome">Nome:</label>
-                    <br />
+            <div className="usuario-container">
 
-                    <input
-                        id="nome"
-                        type="text"
-                        value={nome}
-                        onChange={(event) => setNome(event.target.value)}
-                        placeholder="Digite o nome"
-                    />
+                <div className="usuario-header">
+
+                    <h2>Usuários</h2>
+
+                    <p>
+                        Gerenciamento dos usuários do sistema
+                    </p>
+
                 </div>
 
-                <br />
+                {mensagem && (
+                    <div className="usuario-success">
+                        {mensagem}
+                    </div>
+                )}
 
-                <div>
-                    <label htmlFor="email">E-mail:</label>
-                    <br />
+                {erro && (
+                    <div className="usuario-error">
+                        {erro}
+                    </div>
+                )}
 
-                    <input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                        placeholder="Digite o e-mail"
-                    />
+                <div className="usuario-form-card">
+
+                    <h2>
+                        Cadastrar usuário
+                    </h2>
+
+                    <form
+                        className="usuario-form"
+                        onSubmit={cadastrarUsuario}
+                    >
+
+                        <div className="usuario-field">
+
+                            <label htmlFor="nome">
+                                Nome
+                            </label>
+
+                            <input
+                                id="nome"
+                                type="text"
+                                value={nome}
+                                onChange={(event) =>
+                                    setNome(event.target.value)
+                                }
+                                placeholder="Nome do usuário"
+                            />
+
+                        </div>
+
+                        <div className="usuario-field">
+
+                            <label htmlFor="email">
+                                E-mail
+                            </label>
+
+                            <input
+                                id="email"
+                                type="email"
+                                value={email}
+                                onChange={(event) =>
+                                    setEmail(event.target.value)
+                                }
+                                placeholder="email@exemplo.com"
+                            />
+
+                        </div>
+
+                        <button
+                            className="usuario-button"
+                            type="submit"
+                            disabled={cadastrando}
+                        >
+                            {cadastrando
+                                ? "Cadastrando..."
+                                : "Cadastrar"}
+                        </button>
+
+                    </form>
+
                 </div>
 
-                <br />
+                <div className="usuario-table-card">
 
-                <button type="submit" disabled={cadastrando}>
-                    {cadastrando ? "Cadastrando..." : "Cadastrar"}
-                </button>
-            </form>
+                    {carregando ? (
 
-            <br />
+                        <p className="usuario-loading">
+                            Carregando usuários...
+                        </p>
 
-            {mensagem && <p>{mensagem}</p>}
+                    ) : usuarios.length === 0 ? (
 
-            {erro && <p>{erro}</p>}
+                        <p className="usuario-empty">
+                            Nenhum usuário encontrado.
+                        </p>
 
-            <hr />
+                    ) : (
 
-            <h2>Lista de usuários</h2>
+                        <table className="usuario-table">
 
-            {usuarios.length === 0 ? (
-                <p>Nenhum usuário encontrado.</p>
-            ) : (
-                <ul>
-                    {usuarios.map((usuario) => (
-                        <li key={usuario.id}>
-                            ID: {usuario.id} | Nome: {usuario.nome} | E-mail:{" "}
-                            {usuario.email}{" "}
+                            <thead>
 
-                            <button
-                                onClick={() => excluirUsuario(usuario.id)}
-                                disabled={excluindo === usuario.id}
-                            >
-                                {excluindo === usuario.id
-                                    ? "Excluindo..."
-                                    : "Excluir"}
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-            )}
+                                <tr>
+
+                                    <th>ID</th>
+
+                                    <th>Nome</th>
+
+                                    <th>E-mail</th>
+
+                                    <th>Ação</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {usuarios.map((usuario) => (
+
+                                    <tr key={usuario.id}>
+
+                                        <td>
+                                            {usuario.id}
+                                        </td>
+
+                                        <td>
+                                            {usuario.nome}
+                                        </td>
+
+                                        <td>
+                                            {usuario.email}
+                                        </td>
+
+                                        <td>
+
+                                            <button
+                                                className="usuario-delete"
+                                                onClick={() =>
+                                                    excluirUsuario(
+                                                        usuario.id
+                                                    )
+                                                }
+                                                disabled={
+                                                    excluindo ===
+                                                    usuario.id
+                                                }
+                                            >
+                                                {excluindo ===
+                                                usuario.id
+                                                    ? "Excluindo..."
+                                                    : "Excluir"}
+                                            </button>
+
+                                        </td>
+
+                                    </tr>
+
+                                ))}
+
+                            </tbody>
+
+                        </table>
+
+                    )}
+
+                </div>
+
+            </div>
+
         </div>
     );
 }

@@ -1,0 +1,158 @@
+/* =========================
+   LAYOUT
+========================= */
+
+.app-layout {
+    min-height: 100vh;
+    background: #f4f7fb;
+}
+
+.main-area {
+    margin-left: 240px;
+    min-height: 100vh;
+}
+
+.page-content {
+    padding: 30px;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 240px;
+
+    background: #123b5d;
+    color: white;
+
+    padding: 25px 18px;
+
+    box-sizing: border-box;
+}
+
+.sidebar-logo {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.sidebar-logo h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.sidebar-logo span {
+    color: #93c5fd;
+    font-size: 14px;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sidebar-link {
+    color: #dbeafe;
+    text-decoration: none;
+
+    padding: 13px 15px;
+
+    border-radius: 10px;
+
+    transition: 0.2s;
+}
+
+.sidebar-link:hover {
+    background: #1e5a86;
+    color: white;
+}
+
+.sidebar-link.active {
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar {
+    height: 80px;
+
+    background: white;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 0 30px;
+
+    box-sizing: border-box;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.navbar h1 {
+    margin: 0;
+
+    color: #123b5d;
+
+    font-size: 23px;
+}
+
+.navbar p {
+    margin: 4px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+.navbar-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #475569;
+
+    font-size: 14px;
+}
+
+.status-indicator {
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: #16a34a;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media (max-width: 768px) {
+
+    .sidebar {
+        width: 190px;
+    }
+
+    .main-area {
+        margin-left: 190px;
+    }
+
+    .navbar {
+        padding: 0 20px;
+    }
+
+    .page-content {
+        padding: 20px;
+    }
+}

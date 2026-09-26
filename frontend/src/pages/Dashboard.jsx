@@ -1,165 +1,274 @@
 import { useEffect, useState } from "react";
+
 import api from "../services/api";
 
+import "../styles/dashboard.css";
+
 function Dashboard() {
-const [usuarios, setUsuarios] = useState([]);
-const [usuarioId, setUsuarioId] = useState("");
 
-const [estatistica, setEstatistica] = useState(null);
+    const [usuarios, setUsuarios] = useState([]);
+    const [usuarioId, setUsuarioId] = useState("");
 
-const [carregandoUsuarios, setCarregandoUsuarios] = useState(true);
-const [carregandoEstatistica, setCarregandoEstatistica] =
-    useState(false);
+    const [estatistica, setEstatistica] = useState(null);
 
-const [erro, setErro] = useState("");
+    const [carregandoUsuarios, setCarregandoUsuarios] =
+        useState(true);
 
-useEffect(() => {
-    buscarUsuarios();
-}, []);
+    const [carregandoEstatistica, setCarregandoEstatistica] =
+        useState(false);
 
-async function buscarUsuarios() {
-    try {
-        setCarregandoUsuarios(true);
-        setErro("");
+    const [erro, setErro] = useState("");
 
-        const resposta = await api.get("/usuarios/listar");
+    useEffect(() => {
+        buscarUsuarios();
+    }, []);
 
-        setUsuarios(resposta.data);
+    async function buscarUsuarios() {
 
-        // Seleciona automaticamente o primeiro usuário
-        if (resposta.data.length > 0) {
-            setUsuarioId(resposta.data[0].id);
-        }
-    } catch (error) {
-        console.error("Erro ao buscar usuários:", error);
+        try {
 
-        if (error.response) {
-            setErro(
-                `Erro ${error.response.status}: ${
-                    error.response.data?.detail ||
-                    "Não foi possível buscar os usuários."
-                }`
+            setCarregandoUsuarios(true);
+            setErro("");
+
+            const resposta =
+                await api.get("/usuarios/listar");
+
+            setUsuarios(resposta.data);
+
+            if (resposta.data.length > 0) {
+                setUsuarioId(resposta.data[0].id);
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Erro ao buscar usuários:",
+                error
             );
-        } else if (error.request) {
-            setErro("O servidor não respondeu à requisição.");
-        } else {
-            setErro(`Erro: ${error.message}`);
+
+            if (error.response) {
+
+                setErro(
+                    `Erro ${error.response.status}: ${
+                        error.response.data?.detail ||
+                        "Não foi possível buscar os usuários."
+                    }`
+                );
+
+            } else if (error.request) {
+
+                setErro(
+                    "O servidor não respondeu à requisição."
+                );
+
+            } else {
+
+                setErro(
+                    `Erro: ${error.message}`
+                );
+            }
+
+        } finally {
+
+            setCarregandoUsuarios(false);
+
         }
-    } finally {
-        setCarregandoUsuarios(false);
     }
-}
 
-useEffect(() => {
-    if (usuarioId) {
-        buscarEstatistica(usuarioId);
+    useEffect(() => {
+
+        if (usuarioId) {
+            buscarEstatistica(usuarioId);
+        }
+
+    }, [usuarioId]);
+
+    async function buscarEstatistica(id) {
+
+        try {
+
+            setCarregandoEstatistica(true);
+            setErro("");
+            setEstatistica(null);
+
+            const resposta =
+                await api.get(
+                    `/estatisticas/usuario/${id}`
+                );
+
+            setEstatistica(resposta.data);
+
+        } catch (error) {
+
+            console.error(
+                "Erro ao buscar estatísticas:",
+                error
+            );
+
+            if (error.response) {
+
+                setErro(
+                    `Erro ${error.response.status}: ${
+                        error.response.data?.detail ||
+                        "Não foi possível buscar as estatísticas."
+                    }`
+                );
+
+            } else if (error.request) {
+
+                setErro(
+                    "O servidor não respondeu à requisição."
+                );
+
+            } else {
+
+                setErro(
+                    `Erro: ${error.message}`
+                );
+            }
+
+        } finally {
+
+            setCarregandoEstatistica(false);
+
+        }
     }
-}, [usuarioId]);
 
-async function buscarEstatistica(id) {
-    try {
-        setCarregandoEstatistica(true);
-        setErro("");
-        setEstatistica(null);
+    function alterarUsuario(event) {
 
-        const resposta = await api.get(
-            `/estatisticas/usuario/${id}`
+        const valor = event.target.value;
+
+        setUsuarioId(
+            valor ? Number(valor) : ""
         );
-
-        setEstatistica(resposta.data);
-    } catch (error) {
-        console.error("Erro ao buscar estatísticas:", error);
-
-        if (error.response) {
-            setErro(
-                `Erro ${error.response.status}: ${
-                    error.response.data?.detail ||
-                    "Não foi possível buscar as estatísticas."
-                }`
-            );
-        } else if (error.request) {
-            setErro("O servidor não respondeu à requisição.");
-        } else {
-            setErro(`Erro: ${error.message}`);
-        }
-    } finally {
-        setCarregandoEstatistica(false);
     }
-}
 
-function alterarUsuario(event) {
-    setUsuarioId(Number(event.target.value));
-}
+    const usuarioSelecionado = usuarios.find(
+        (usuario) => usuario.id === usuarioId
+    );
 
-const usuarioSelecionado = usuarios.find(
-    (usuario) => usuario.id === usuarioId
-);
+    return (
 
-return (
-    <div>
-        <h1>PERFORMANCE ANALYTICS</h1>
+        <div className="dashboard">
 
-        <hr />
-
-        <h2>Selecionar usuário</h2>
-
-        {carregandoUsuarios ? (
-            <p>Carregando usuários...</p>
-        ) : (
-            <select
-                value={usuarioId}
-                onChange={alterarUsuario}
-            >
-                <option value="">
-                    Selecione um usuário
-                </option>
-
-                {usuarios.map((usuario) => (
-                    <option
-                        key={usuario.id}
-                        value={usuario.id}
-                    >
-                        {usuario.nome} - ID: {usuario.id}
-                    </option>
-                ))}
-            </select>
-        )}
-
-        {usuarioSelecionado && (
-            <h2>
-                Usuário: {usuarioSelecionado.nome}
-            </h2>
-        )}
-
-        {erro && <p>{erro}</p>}
-
-        {carregandoEstatistica && (
-            <p>Carregando estatísticas...</p>
-        )}
-
-        {estatistica && (
-            <div>
-                <div>
-                    <h3>Taxa de Acerto</h3>
-
-                    <p>
-                        {estatistica.taxa_acerto.toFixed(2)}%
-                    </p>
-                </div>
+            <div className="dashboard-header">
 
                 <div>
-                    <h3>Taxa de Erro</h3>
+
+                    <h2>Visão geral</h2>
 
                     <p>
-                        {estatistica.taxa_erro.toFixed(2)}%
+                        Acompanhamento do desempenho do usuário
                     </p>
+
                 </div>
+
             </div>
-        )}
-    </div>
-);
 
+            <div className="dashboard-user-selector">
 
+                <label htmlFor="usuario">
+                    Usuário
+                </label>
+
+                {carregandoUsuarios ? (
+
+                    <p className="dashboard-loading">
+                        Carregando usuários...
+                    </p>
+
+                ) : (
+
+                    <select
+                        id="usuario"
+                        value={usuarioId}
+                        onChange={alterarUsuario}
+                    >
+
+                        <option value="">
+                            Selecione um usuário
+                        </option>
+
+                        {usuarios.map((usuario) => (
+
+                            <option
+                                key={usuario.id}
+                                value={usuario.id}
+                            >
+                                {usuario.nome} - ID: {usuario.id}
+                            </option>
+
+                        ))}
+
+                    </select>
+
+                )}
+
+            </div>
+
+            {usuarioSelecionado && (
+
+                <div className="dashboard-selected-user">
+
+                    Usuário selecionado:{" "}
+                    <strong>
+                        {usuarioSelecionado.nome}
+                    </strong>
+
+                </div>
+
+            )}
+
+            {erro && (
+
+                <div className="dashboard-error">
+                    {erro}
+                </div>
+
+            )}
+
+            {carregandoEstatistica && (
+
+                <p className="dashboard-loading">
+                    Carregando estatísticas...
+                </p>
+
+            )}
+
+            {estatistica && (
+
+                <div className="dashboard-cards">
+
+                    <div className="dashboard-card success">
+
+                        <h3>
+                            Taxa de acerto
+                        </h3>
+
+                        <div className="dashboard-card-value">
+                            {estatistica.taxa_acerto.toFixed(2)}%
+                        </div>
+
+                    </div>
+
+                    <div className="dashboard-card error">
+
+                        <h3>
+                            Taxa de erro
+                        </h3>
+
+                        <div className="dashboard-card-value">
+                            {estatistica.taxa_erro.toFixed(2)}%
+                        </div>
+
+                    </div>
+
+                </div>
+
+            )}
+
+        </div>
+    );
 }
 
 export default Dashboard;

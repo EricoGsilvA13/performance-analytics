@@ -1,0 +1,178 @@
+.dashboard {
+    min-height: calc(100vh - 80px);
+}
+
+.dashboard-header {
+    margin-bottom: 25px;
+}
+
+.dashboard-header h2 {
+    margin: 0;
+
+    color: #123b5d;
+
+    font-size: 26px;
+}
+
+.dashboard-header p {
+    margin-top: 6px;
+
+    color: #64748b;
+}
+
+/* =========================
+   USUÁRIO
+========================= */
+
+.dashboard-user-selector {
+    background: white;
+
+    padding: 22px;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.06);
+
+    margin-bottom: 20px;
+}
+
+.dashboard-user-selector label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-weight: 600;
+
+    color: #334155;
+}
+
+.dashboard-user-selector select {
+    width: 100%;
+    max-width: 450px;
+
+    padding: 11px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    background: white;
+
+    color: #1f2937;
+
+    font-size: 15px;
+}
+
+.dashboard-user-selector select:focus {
+    outline: none;
+
+    border-color: #2563eb;
+}
+
+/* =========================
+   USUÁRIO SELECIONADO
+========================= */
+
+.dashboard-selected-user {
+    background: #eff6ff;
+
+    border-left: 4px solid #2563eb;
+
+    padding: 14px 18px;
+
+    margin-bottom: 20px;
+
+    border-radius: 8px;
+
+    color: #1e3a5f;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.dashboard-cards {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+}
+
+.dashboard-card {
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.06);
+
+    border-left: 5px solid #2563eb;
+}
+
+.dashboard-card.success {
+    border-left-color: #16a34a;
+}
+
+.dashboard-card.error {
+    border-left-color: #dc2626;
+}
+
+.dashboard-card h3 {
+    margin: 0 0 12px;
+
+    color: #64748b;
+
+    font-size: 15px;
+}
+
+.dashboard-card-value {
+    font-size: 34px;
+
+    font-weight: 700;
+
+    color: #123b5d;
+}
+
+.dashboard-card.success .dashboard-card-value {
+    color: #16a34a;
+}
+
+.dashboard-card.error .dashboard-card-value {
+    color: #dc2626;
+}
+
+/* =========================
+   MENSAGENS
+========================= */
+
+.dashboard-error {
+    background: #fee2e2;
+
+    color: #991b1b;
+
+    padding: 14px;
+
+    border-radius: 8px;
+
+    margin-bottom: 20px;
+}
+
+.dashboard-loading {
+    color: #64748b;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media (max-width: 700px) {
+
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+    }
+}

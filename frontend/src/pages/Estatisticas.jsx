@@ -1,211 +1,360 @@
 import { useState } from "react";
+
 import api from "../services/api";
 
+import "../styles/estatistica.css";
+
 function Estatisticas() {
+
     const [sessaoId, setSessaoId] = useState("");
     const [usuarioId, setUsuarioId] = useState("");
 
-    const [estatisticaSessao, setEstatisticaSessao] = useState(null);
-    const [estatisticaUsuario, setEstatisticaUsuario] = useState(null);
+    const [estatisticaSessao, setEstatisticaSessao] =
+        useState(null);
 
-    const [carregandoSessao, setCarregandoSessao] = useState(false);
-    const [carregandoUsuario, setCarregandoUsuario] = useState(false);
+    const [estatisticaUsuario, setEstatisticaUsuario] =
+        useState(null);
+
+    const [carregandoSessao, setCarregandoSessao] =
+        useState(false);
+
+    const [carregandoUsuario, setCarregandoUsuario] =
+        useState(false);
 
     const [erro, setErro] = useState("");
 
     async function buscarEstatisticaSessao(event) {
+
         event.preventDefault();
 
         setErro("");
         setEstatisticaSessao(null);
 
         if (!sessaoId) {
-            setErro("Informe o ID da sessão.");
+
+            setErro(
+                "Informe o ID da sessão."
+            );
+
             return;
         }
 
         try {
+
             setCarregandoSessao(true);
 
-            const resposta = await api.get(
-                `/estatisticas/sessao/${sessaoId}`
+            const resposta =
+                await api.get(
+                    `/estatisticas/sessao/${sessaoId}`
+                );
+
+            setEstatisticaSessao(
+                resposta.data
             );
 
-            setEstatisticaSessao(resposta.data);
         } catch (error) {
+
             console.error(
                 "Erro ao buscar estatística da sessão:",
                 error
             );
 
             if (error.response) {
+
                 setErro(
                     `Erro ${error.response.status}: ${
                         error.response.data?.detail ||
                         "Não foi possível buscar a estatística da sessão."
                     }`
                 );
-            } else if (error.request) {
-                setErro("O servidor não respondeu à requisição.");
+
             } else {
-                setErro(`Erro: ${error.message}`);
+
+                setErro(
+                    "Não foi possível conectar ao servidor."
+                );
             }
+
         } finally {
+
             setCarregandoSessao(false);
+
         }
     }
 
     async function buscarEstatisticaUsuario(event) {
+
         event.preventDefault();
 
         setErro("");
         setEstatisticaUsuario(null);
 
         if (!usuarioId) {
-            setErro("Informe o ID do usuário.");
+
+            setErro(
+                "Informe o ID do usuário."
+            );
+
             return;
         }
 
         try {
+
             setCarregandoUsuario(true);
 
-            const resposta = await api.get(
-                `/estatisticas/usuario/${usuarioId}`
+            const resposta =
+                await api.get(
+                    `/estatisticas/usuario/${usuarioId}`
+                );
+
+            setEstatisticaUsuario(
+                resposta.data
             );
 
-            setEstatisticaUsuario(resposta.data);
         } catch (error) {
+
             console.error(
                 "Erro ao buscar estatística do usuário:",
                 error
             );
 
             if (error.response) {
+
                 setErro(
                     `Erro ${error.response.status}: ${
                         error.response.data?.detail ||
                         "Não foi possível buscar a estatística do usuário."
                     }`
                 );
-            } else if (error.request) {
-                setErro("O servidor não respondeu à requisição.");
+
             } else {
-                setErro(`Erro: ${error.message}`);
+
+                setErro(
+                    "Não foi possível conectar ao servidor."
+                );
             }
+
         } finally {
+
             setCarregandoUsuario(false);
+
         }
     }
 
     return (
-        <div>
-            <h1>Estatísticas</h1>
 
-            {erro && <p>{erro}</p>}
+        <div className="estatistica-page">
 
-            <hr />
+            <div className="estatistica-container">
 
-            <h2>Estatística da sessão</h2>
+                <div className="estatistica-header">
 
-            <form onSubmit={buscarEstatisticaSessao}>
-                <label htmlFor="sessaoId">
-                    ID da sessão:
-                </label>
-
-                <br />
-
-                <input
-                    id="sessaoId"
-                    type="number"
-                    value={sessaoId}
-                    onChange={(event) => setSessaoId(event.target.value)}
-                    placeholder="Digite o ID da sessão"
-                />
-
-                <br />
-                <br />
-
-                <button
-                    type="submit"
-                    disabled={carregandoSessao}
-                >
-                    {carregandoSessao
-                        ? "Consultando..."
-                        : "Buscar estatística"}
-                </button>
-            </form>
-
-            {estatisticaSessao && (
-                <div>
-                    <h3>Resultado da sessão</h3>
+                    <h2>Estatísticas</h2>
 
                     <p>
-                        Sessão: {estatisticaSessao.sessao_id}
+                        Análise de desempenho
                     </p>
 
-                    <p>
-                        Taxa de acerto:{" "}
-                        {estatisticaSessao.taxa_acerto.toFixed(2)}%
-                    </p>
-
-                    <p>
-                        Taxa de erro:{" "}
-                        {estatisticaSessao.taxa_erro.toFixed(2)}%
-                    </p>
                 </div>
-            )}
 
-            <hr />
+                {erro && (
+                    <div className="estatistica-error">
+                        {erro}
+                    </div>
+                )}
 
-            <h2>Estatística do usuário</h2>
+                {/* =========================
+                    SESSÃO
+                ========================= */}
 
-            <form onSubmit={buscarEstatisticaUsuario}>
-                <label htmlFor="usuarioId">
-                    ID do usuário:
-                </label>
+                <div className="estatistica-section">
 
-                <br />
+                    <h2>
+                        Estatística da sessão
+                    </h2>
 
-                <input
-                    id="usuarioId"
-                    type="number"
-                    value={usuarioId}
-                    onChange={(event) => setUsuarioId(event.target.value)}
-                    placeholder="Digite o ID do usuário"
-                />
+                    <form
+                        className="estatistica-form"
+                        onSubmit={
+                            buscarEstatisticaSessao
+                        }
+                    >
 
-                <br />
-                <br />
+                        <div className="estatistica-field">
 
-                <button
-                    type="submit"
-                    disabled={carregandoUsuario}
-                >
-                    {carregandoUsuario
-                        ? "Consultando..."
-                        : "Buscar estatística"}
-                </button>
-            </form>
+                            <label htmlFor="sessaoId">
+                                ID da sessão
+                            </label>
 
-            {estatisticaUsuario && (
-                <div>
-                    <h3>Resultado do usuário</h3>
+                            <input
+                                id="sessaoId"
+                                type="number"
+                                value={sessaoId}
+                                onChange={(event) =>
+                                    setSessaoId(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="Digite o ID"
+                            />
 
-                    <p>
-                        Usuário: {estatisticaUsuario.usuario_id}
-                    </p>
+                        </div>
 
-                    <p>
-                        Taxa de acerto:{" "}
-                        {estatisticaUsuario.taxa_acerto.toFixed(2)}%
-                    </p>
+                        <button
+                            className="estatistica-button"
+                            type="submit"
+                            disabled={
+                                carregandoSessao
+                            }
+                        >
+                            {carregandoSessao
+                                ? "Consultando..."
+                                : "Buscar estatística"}
+                        </button>
 
-                    <p>
-                        Taxa de erro:{" "}
-                        {estatisticaUsuario.taxa_erro.toFixed(2)}%
-                    </p>
+                    </form>
+
+                    {estatisticaSessao && (
+
+                        <div className="estatistica-result">
+
+                            <div className="estatistica-card acerto">
+
+                                <h3>
+                                    Taxa de acerto
+                                </h3>
+
+                                <div className="estatistica-value">
+
+                                    {estatisticaSessao
+                                        .taxa_acerto
+                                        .toFixed(2)}
+                                    %
+
+                                </div>
+
+                            </div>
+
+                            <div className="estatistica-card erro">
+
+                                <h3>
+                                    Taxa de erro
+                                </h3>
+
+                                <div className="estatistica-value">
+
+                                    {estatisticaSessao
+                                        .taxa_erro
+                                        .toFixed(2)}
+                                    %
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    )}
+
                 </div>
-            )}
+
+                {/* =========================
+                    USUÁRIO
+                ========================= */}
+
+                <div className="estatistica-section">
+
+                    <h2>
+                        Estatística do usuário
+                    </h2>
+
+                    <form
+                        className="estatistica-form"
+                        onSubmit={
+                            buscarEstatisticaUsuario
+                        }
+                    >
+
+                        <div className="estatistica-field">
+
+                            <label htmlFor="usuarioId">
+                                ID do usuário
+                            </label>
+
+                            <input
+                                id="usuarioId"
+                                type="number"
+                                value={usuarioId}
+                                onChange={(event) =>
+                                    setUsuarioId(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="Digite o ID"
+                            />
+
+                        </div>
+
+                        <button
+                            className="estatistica-button"
+                            type="submit"
+                            disabled={
+                                carregandoUsuario
+                            }
+                        >
+                            {carregandoUsuario
+                                ? "Consultando..."
+                                : "Buscar estatística"}
+                        </button>
+
+                    </form>
+
+                    {estatisticaUsuario && (
+
+                        <div className="estatistica-result">
+
+                            <div className="estatistica-card acerto">
+
+                                <h3>
+                                    Taxa de acerto
+                                </h3>
+
+                                <div className="estatistica-value">
+
+                                    {estatisticaUsuario
+                                        .taxa_acerto
+                                        .toFixed(2)}
+                                    %
+
+                                </div>
+
+                            </div>
+
+                            <div className="estatistica-card erro">
+
+                                <h3>
+                                    Taxa de erro
+                                </h3>
+
+                                <div className="estatistica-value">
+
+                                    {estatisticaUsuario
+                                        .taxa_erro
+                                        .toFixed(2)}
+                                    %
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    )}
+
+                </div>
+
+            </div>
+
         </div>
     );
 }

@@ -1,0 +1,285 @@
+.sessao-page {
+    min-height: calc(100vh - 80px);
+}
+
+.sessao-container {
+    max-width: 1300px;
+
+    margin: 0 auto;
+}
+
+.sessao-header {
+    margin-bottom: 25px;
+}
+
+.sessao-header h2 {
+    margin: 0;
+
+    color: #123b5d;
+
+    font-size: 26px;
+}
+
+.sessao-header p {
+    color: #64748b;
+
+    margin-top: 6px;
+}
+
+/* =========================
+   FORMULÁRIO
+========================= */
+
+.sessao-form-card {
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.06);
+
+    margin-bottom: 25px;
+}
+
+.sessao-form-card h2,
+.sessao-list-card h2 {
+    margin-top: 0;
+
+    color: #123b5d;
+}
+
+.sessao-form {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.sessao-field {
+    display: flex;
+
+    flex-direction: column;
+}
+
+.sessao-field label {
+    margin-bottom: 7px;
+
+    font-weight: 600;
+
+    color: #334155;
+}
+
+.sessao-field input {
+    padding: 11px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+}
+
+.sessao-field input:focus {
+    outline: none;
+
+    border-color: #2563eb;
+}
+
+.sessao-submit {
+    grid-column: 1 / -1;
+
+    padding: 13px;
+
+    background: #2563eb;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    font-size: 15px;
+}
+
+.sessao-submit:hover {
+    background: #1d4ed8;
+}
+
+.sessao-submit:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+/* =========================
+   LISTA
+========================= */
+
+.sessao-list-card {
+    background: white;
+
+    padding: 25px;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.06);
+}
+
+.sessao-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+.sessao-item {
+    display: grid;
+
+    grid-template-columns:
+        70px
+        1fr
+        1fr
+        1fr
+        1.5fr
+        100px;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 18px;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    transition: 0.2s;
+}
+
+.sessao-item:hover {
+    box-shadow:
+        0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.sessao-id {
+    color: #123b5d;
+
+    font-weight: 700;
+}
+
+.sessao-info {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+.sessao-label {
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+.sessao-value {
+    color: #1f2937;
+
+    font-weight: 600;
+}
+
+.sessao-delete {
+    padding: 9px;
+
+    background: #dc2626;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+}
+
+.sessao-delete:hover {
+    background: #b91c1c;
+}
+
+.sessao-delete:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+/* =========================
+   MENSAGENS
+========================= */
+
+.sessao-success {
+    padding: 12px;
+
+    margin-bottom: 15px;
+
+    background: #dcfce7;
+
+    color: #166534;
+
+    border-radius: 8px;
+}
+
+.sessao-error {
+    padding: 12px;
+
+    margin-bottom: 15px;
+
+    background: #fee2e2;
+
+    color: #991b1b;
+
+    border-radius: 8px;
+}
+
+.sessao-loading,
+.sessao-empty {
+    color: #64748b;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media (max-width: 1000px) {
+
+    .sessao-form {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sessao-item {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+
+    .sessao-form {
+        grid-template-columns: 1fr;
+    }
+
+    .sessao-submit {
+        grid-column: auto;
+    }
+
+    .sessao-item {
+        grid-template-columns: 1fr;
+    }
+}
