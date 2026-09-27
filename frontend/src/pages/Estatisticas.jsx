@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import api from "../services/api";
 
-import "../styles/estatistica.css";
+import "../Styles/estatistica.css";
 
 function Estatisticas() {
 

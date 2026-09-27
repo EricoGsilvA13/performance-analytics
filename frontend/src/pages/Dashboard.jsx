@@ -18,7 +18,7 @@ import {
     Line
 } from "recharts";
 
-import "../styles/dashboard.css";
+import "../Styles/dashboard.css";
 
 function Dashboard() {
 

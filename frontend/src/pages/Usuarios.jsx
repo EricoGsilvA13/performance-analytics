@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import api from "../services/api";
 
-import "../styles/usuario.css";
+import "../Styles/usuario.css";
 
 function Usuarios() {
 
