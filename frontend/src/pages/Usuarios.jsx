@@ -11,8 +11,10 @@ function Usuarios() {
     const [nome, setNome] = useState("");
     const [email, setEmail] = useState("");
 
+    const [usuarioEditando, setUsuarioEditando] = useState(null);
+
     const [carregando, setCarregando] = useState(true);
-    const [cadastrando, setCadastrando] = useState(false);
+    const [salvando, setSalvando] = useState(false);
     const [excluindo, setExcluindo] = useState(null);
 
     const [erro, setErro] = useState("");
@@ -48,11 +50,10 @@ function Usuarios() {
         } finally {
 
             setCarregando(false);
-
         }
     }
 
-    async function cadastrarUsuario(event) {
+    async function salvarUsuario(event) {
 
         event.preventDefault();
 
@@ -70,29 +71,44 @@ function Usuarios() {
 
         try {
 
-            setCadastrando(true);
+            setSalvando(true);
 
-            await api.post(
-                "/usuarios/criar",
-                {
-                    nome: nome.trim(),
-                    email: email.trim()
-                }
-            );
+            const dadosUsuario = {
+                nome: nome.trim(),
+                email: email.trim()
+            };
 
-            setMensagem(
-                "Usuário cadastrado com sucesso!"
-            );
+            if (usuarioEditando !== null) {
 
-            setNome("");
-            setEmail("");
+                await api.put(
+                    `/usuarios/atualizar/${usuarioEditando}`,
+                    dadosUsuario
+                );
+
+                setMensagem(
+                    "Usuário atualizado com sucesso!"
+                );
+
+            } else {
+
+                await api.post(
+                    "/usuarios/criar",
+                    dadosUsuario
+                );
+
+                setMensagem(
+                    "Usuário cadastrado com sucesso!"
+                );
+            }
+
+            limparFormulario();
 
             await buscarUsuarios();
 
         } catch (error) {
 
             console.error(
-                "Erro ao cadastrar usuário:",
+                "Erro ao salvar usuário:",
                 error
             );
 
@@ -100,7 +116,7 @@ function Usuarios() {
 
                 setErro(
                     error.response.data?.detail ||
-                    "Não foi possível cadastrar o usuário."
+                    "Não foi possível salvar o usuário."
                 );
 
             } else {
@@ -112,9 +128,39 @@ function Usuarios() {
 
         } finally {
 
-            setCadastrando(false);
-
+            setSalvando(false);
         }
+    }
+
+    function iniciarEdicao(usuario) {
+
+        setUsuarioEditando(usuario.id);
+
+        setNome(usuario.nome);
+        setEmail(usuario.email);
+
+        setErro("");
+        setMensagem("");
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+
+    function cancelarEdicao() {
+
+        limparFormulario();
+
+        setErro("");
+        setMensagem("");
+    }
+
+    function limparFormulario() {
+
+        setNome("");
+        setEmail("");
+        setUsuarioEditando(null);
     }
 
     async function excluirUsuario(id) {
@@ -143,6 +189,10 @@ function Usuarios() {
                 "Usuário excluído com sucesso!"
             );
 
+            if (usuarioEditando === id) {
+                limparFormulario();
+            }
+
             await buscarUsuarios();
 
         } catch (error) {
@@ -152,14 +202,23 @@ function Usuarios() {
                 error
             );
 
-            setErro(
-                "Não foi possível excluir o usuário."
-            );
+            if (error.response) {
+
+                setErro(
+                    error.response.data?.detail ||
+                    "Não foi possível excluir o usuário."
+                );
+
+            } else {
+
+                setErro(
+                    "Não foi possível conectar ao servidor."
+                );
+            }
 
         } finally {
 
             setExcluindo(null);
-
         }
     }
 
@@ -171,7 +230,9 @@ function Usuarios() {
 
                 <div className="usuario-header">
 
-                    <h2>Usuários</h2>
+                    <h2>
+                        Usuários
+                    </h2>
 
                     <p>
                         Gerenciamento dos usuários do sistema
@@ -179,27 +240,36 @@ function Usuarios() {
 
                 </div>
 
+
                 {mensagem && (
+
                     <div className="usuario-success">
                         {mensagem}
                     </div>
+
                 )}
 
+
                 {erro && (
+
                     <div className="usuario-error">
                         {erro}
                     </div>
+
                 )}
+
 
                 <div className="usuario-form-card">
 
                     <h2>
-                        Cadastrar usuário
+                        {usuarioEditando !== null
+                            ? "Atualizar usuário"
+                            : "Cadastrar usuário"}
                     </h2>
 
                     <form
                         className="usuario-form"
-                        onSubmit={cadastrarUsuario}
+                        onSubmit={salvarUsuario}
                     >
 
                         <div className="usuario-field">
@@ -220,6 +290,7 @@ function Usuarios() {
 
                         </div>
 
+
                         <div className="usuario-field">
 
                             <label htmlFor="email">
@@ -238,19 +309,43 @@ function Usuarios() {
 
                         </div>
 
-                        <button
-                            className="usuario-button"
-                            type="submit"
-                            disabled={cadastrando}
-                        >
-                            {cadastrando
-                                ? "Cadastrando..."
-                                : "Cadastrar"}
-                        </button>
+
+                        <div className="usuario-form-actions">
+
+                            <button
+                                className="usuario-button"
+                                type="submit"
+                                disabled={salvando}
+                            >
+
+                                {salvando
+                                    ? "Salvando..."
+                                    : usuarioEditando !== null
+                                        ? "Atualizar"
+                                        : "Cadastrar"}
+
+                            </button>
+
+
+                            {usuarioEditando !== null && (
+
+                                <button
+                                    className="usuario-cancel"
+                                    type="button"
+                                    onClick={cancelarEdicao}
+                                    disabled={salvando}
+                                >
+                                    Cancelar
+                                </button>
+
+                            )}
+
+                        </div>
 
                     </form>
 
                 </div>
+
 
                 <div className="usuario-table-card">
 
@@ -275,16 +370,14 @@ function Usuarios() {
                                 <tr>
 
                                     <th>ID</th>
-
                                     <th>Nome</th>
-
                                     <th>E-mail</th>
-
                                     <th>Ação</th>
 
                                 </tr>
 
                             </thead>
+
 
                             <tbody>
 
@@ -306,23 +399,42 @@ function Usuarios() {
 
                                         <td>
 
-                                            <button
-                                                className="usuario-delete"
-                                                onClick={() =>
-                                                    excluirUsuario(
+                                            <div className="usuario-actions">
+
+                                                <button
+                                                    className="usuario-edit"
+                                                    onClick={() =>
+                                                        iniciarEdicao(usuario)
+                                                    }
+                                                    disabled={
+                                                        salvando ||
+                                                        excluindo === usuario.id
+                                                    }
+                                                >
+                                                    Editar
+                                                </button>
+
+
+                                                <button
+                                                    className="usuario-delete"
+                                                    onClick={() =>
+                                                        excluirUsuario(
+                                                            usuario.id
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        excluindo ===
+                                                        usuario.id ||
+                                                        salvando
+                                                    }
+                                                >
+                                                    {excluindo ===
                                                         usuario.id
-                                                    )
-                                                }
-                                                disabled={
-                                                    excluindo ===
-                                                    usuario.id
-                                                }
-                                            >
-                                                {excluindo ===
-                                                usuario.id
-                                                    ? "Excluindo..."
-                                                    : "Excluir"}
-                                            </button>
+                                                        ? "Excluindo..."
+                                                        : "Excluir"}
+                                                </button>
+
+                                            </div>
 
                                         </td>
 
