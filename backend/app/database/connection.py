@@ -11,3 +11,4 @@ porta = os.getenv("DB_PORT")
 banco = os.getenv("DB_NAME")
 
 engine = create_engine(f"mysql+pymysql://{usuario}:{senha}@{host}:{porta}/{banco}")
+

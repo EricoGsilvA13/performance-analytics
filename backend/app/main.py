@@ -23,6 +23,12 @@ allow_methods=[""],
 allow_headers=[""],
 )
 
+@app.get("/")
+def inicio():
+    return {
+        "mensagem": "Performance Analytics API",
+        "status": "online"
+    }
 #cd backend
 #uvicorn app.main:app --reload
 #cd frontend
