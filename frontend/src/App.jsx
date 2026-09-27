@@ -11,7 +11,7 @@ import Usuarios from "./pages/Usuarios";
 import Sessoes from "./pages/Sessoes";
 import Estatisticas from "./pages/Estatisticas";
 
-import "./styles/layout.css";
+import "./Styles/layout.css";
 
 function App() {
     return (
