@@ -11,8 +11,15 @@ allow_origins=[
 "https://performance-analytics-psi.vercel.app",
 ],
 allow_credentials=True,
-allow_methods=[ ""],
-allow_headers=[""],
+allow_methods=["GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "OPTIONS",
+        "PATCH",],
+allow_headers=[ "Content-Type",
+        "Authorization",
+    ],
 )
 
 from app.routes.usuario import usuario_router
