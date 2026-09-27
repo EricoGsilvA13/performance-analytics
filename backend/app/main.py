@@ -3,26 +3,25 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-from app.routes.usuario import usuario_router
-from app.routes.sessao import sessao_router
-from app.routes.estatistica import estatistica_router
-
-
-app.include_router(usuario_router)
-app.include_router(sessao_router)
-app.include_router(estatistica_router)
-
 app.add_middleware(
 CORSMiddleware,
 allow_origins=[
 "http://localhost:5173",
 "http://127.0.0.1:5173",
-"https://performance-analytics-psi.vercel.app",
+"https://performance-analytics-psi.vercel.app/",
 ],
 allow_credentials=True,
 allow_methods=[""],
 allow_headers=[""],
 )
+
+from app.routes.usuario import usuario_router
+from app.routes.sessao import sessao_router
+from app.routes.estatistica import estatistica_router
+
+app.include_router(usuario_router)
+app.include_router(sessao_router)
+app.include_router(estatistica_router)
 
 @app.get("/")
 def inicio():
