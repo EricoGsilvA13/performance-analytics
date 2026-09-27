@@ -97,11 +97,23 @@ function Dashboard() {
 
     useEffect(() => {
 
-        if (usuarioId) {
-            buscarEstatistica(usuarioId);
+        if (!usuarioId || carregando) {
+            return;
         }
 
-    }, [usuarioId]);
+        const possuiSessoes = sessoes.some(
+            (sessao) => sessao.usuario_id === usuarioId
+        );
+
+        if (!possuiSessoes) {
+            setEstatistica(null);
+            setErro("");
+            return;
+        }
+
+        buscarEstatistica(usuarioId);
+
+    }, [usuarioId, sessoes, carregando]);
 
     async function buscarEstatistica(id) {
 
@@ -123,6 +135,14 @@ function Dashboard() {
                 "Erro ao buscar estatísticas:",
                 error
             );
+
+            if (error.response?.status === 404) {
+
+                // O usuário existe, mas ainda não possui sessões.
+                setEstatistica(null);
+                setErro("");
+                return;
+            }
 
             if (error.response) {
 
@@ -154,6 +174,7 @@ function Dashboard() {
     /*
      * Sessões do usuário selecionado
      */
+
     const sessoesUsuario =
         sessoes.filter(
             (sessao) =>
@@ -178,7 +199,7 @@ function Dashboard() {
                         sessao.pontuacao
                 )
             )
-            : 0;
+            : null;
 
     const pontuacaoMedia =
         sessoesUsuario.length > 0
@@ -187,7 +208,7 @@ function Dashboard() {
                     total + sessao.pontuacao,
                 0
             ) / sessoesUsuario.length
-            : 0;
+            : null;
 
     const tempoTotalSegundos =
         sessoesUsuario.reduce(
@@ -454,7 +475,9 @@ function Dashboard() {
                                 </h3>
 
                                 <div className="dashboard-card-value">
-                                    {melhorPontuacao}
+                                    {melhorPontuacao !== null
+                                        ? melhorPontuacao
+                                        : "—"}
                                 </div>
 
                                 <span className="dashboard-card-description">
@@ -479,7 +502,9 @@ function Dashboard() {
                                 </h3>
 
                                 <div className="dashboard-card-value">
-                                    {pontuacaoMedia.toFixed(2)}
+                                    {pontuacaoMedia !== null
+                                        ? pontuacaoMedia.toFixed(2)
+                                        : "—"}
                                 </div>
 
                                 <span className="dashboard-card-description">
